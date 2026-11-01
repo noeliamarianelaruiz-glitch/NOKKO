@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>NOKKO</title>
+  <meta name="application-name" content="NOKKO">
+  <meta name="apple-mobile-web-app-title" content="NOKKO">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#18233F">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%2318233F'/%3E%3Ctext x='256' y='340' font-family='sans-serif' font-size='300' font-weight='900' fill='%23E0F479' text-anchor='middle'%3EN%3C/text%3E%3C/svg%3E">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%2318233F'/%3E%3Ctext x='256' y='340' font-family='sans-serif' font-size='300' font-weight='900' fill='%23E0F479' text-anchor='middle'%3EN%3C/text%3E%3C/svg%3E">
+  <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22NOKKO%22%2C%22short_name%22%3A%22NOKKO%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%2318233F%22%2C%22theme_color%22%3A%22%2318233F%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20512%20512'%253E%253Crect%20width%3D'512'%20height%3D'512'%20rx%3D'100'%20fill%3D'%252318233F'%2F%253E%253Ctext%20x%3D'256'%20y%3D'340'%20font-family%3D'sans-serif'%20font-size%3D'300'%20font-weight%3D'900'%20fill%3D'%2523E0F479'%20text-anchor%3D'middle'%253EN%253C%2Ftext%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #18233F;
+      --floral-blue: #92BAD4;
+      --silky-white: #F7F3E7;
+      --lime: #E0F479;
+      --surface: #FFFFFF;
+      --surface-alt: #EFECE0;
+      --border: #DFD8C7;
+      --text-muted: #57627B;
+      --danger: #991B1B;
+      --danger-bg: #FEE2E2;
+      --warning: #F59E0B;
+      
+      --dot-alimentacion: #365314;
+      --dot-transporte: #2563EB;
+      --dot-entretenimiento: #D97706;
+      --dot-salud: #DC2626;
+      --dot-servicios: #7C3AED;
+      --dot-educacion: #0F766E;
+      --dot-otros: #64748B;
+
+      --font-heading: 'Oswald', sans-serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #111726;
+      font-family: var(--font-body);
+      color: var(--navy);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 12px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .phone-frame {
+      width: 100%;
+      max-width: 400px;
+      height: 830px;
+      background-color: var(--silky-white);
+      border-radius: 36px;
+      border: 10px solid #0B0F19;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 0 2px #263147;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    @media (max-width: 440px) {
+      body {
+        padding: 0;
+        background-color: var(--silky-white);
+      }
+      .phone-frame {
+        max-width: 100%;
+        height: 100dvh;
+        height: 100vh;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+      }
+    }
+
+    .status-bar {
+      background-color: var(--navy);
+      color: var(--silky-white);
+      padding: 10px 22px 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      flex-shrink: 0;
+    }
+
+    .status-icons {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .app-header {
+      background-color: var(--navy);
+      padding: 10px 20px 14px;
+      border-bottom: 3px solid var(--lime);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .header-title {
+      font-family: var(--font-heading);
+      color: var(--silky-white);
+      font-size: 1.65rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+
+    .btn-reset-demo {
+      background-color: rgba(255, 255, 255, 0.08);
+      color: var(--floral-blue);
+      border: 1px solid rgba(146, 186, 212, 0.3);
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .app-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .tab-screen {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .tab-screen.active {
+      display: flex;
+    }
+
+    .total-card {
+      background-color: var(--navy);
+      border-radius: 10px;
+      padding: 16px;
+      color: var(--silky-white);
+    }
+
+    .total-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .total-label {
+      color: var(--floral-blue);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .btn-edit-limit {
+      background: none;
+      border: none;
+      color: var(--lime);
+      font-size: 0.72rem;
+      text-decoration: underline;
+      cursor: pointer;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .total-value {
+      font-family: var(--font-heading);
+      color: var(--lime);
+      font-size: 2.25rem;
+      font-weight: 700;
+      line-height: 1.1;
+      margin: 4px 0;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .total-sub {
+      font-size: 0.75rem;
+      color: #CBD5E1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .budget-box {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .budget-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      color: #CBD5E1;
+      margin-bottom: 5px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .budget-track {
+      height: 6px;
+      background-color: rgba(255, 255, 255, 0.15);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .budget-fill {
+      height: 100%;
+      background-color: var(--lime);
+      border-radius: 99px;
+      transition: width 0.25s ease;
+    }
+
+    .budget-fill.warning { background-color: var(--warning); }
+    .budget-fill.exceeded { background-color: #F87171; }
+
+    .max-badge {
+      background-color: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.76rem;
+      color: var(--navy);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .app-card {
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    .app-card.editing-mode {
+      border: 2px solid var(--navy);
+      background-color: #FAF9F4;
+    }
+
+    .card-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .card-title {
+      font-family: var(--font-heading);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .editing-badge {
+      display: none;
+      background-color: var(--lime);
+      color: var(--navy);
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    .editing-badge.show {
+      display: inline-block;
+    }
+
+    .field-group {
+      margin-bottom: 10px;
+    }
+
+    .field-label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-bottom: 4px;
+    }
+
+    .rn-input {
+      width: 100%;
+      background-color: var(--silky-white);
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 9px 11px;
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      color: var(--navy);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .rn-input:focus {
+      outline: none;
+      border-color: var(--navy);
+      background-color: #FFFFFF;
+    }
+
+    .field-error {
+      color: var(--danger);
+      font-size: 0.72rem;
+      font-weight: 600;
+      margin-top: 3px;
+      display: none;
+    }
+
+    
+    .cat-chip, .filter-pill, .exp-tag, .breakdown-item {
+      cursor: pointer;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .exp-tag:active {
+      transform: scale(0.96);
+    }
+    .breakdown-item {
+      padding: 6px;
+      border-radius: 6px;
+      transition: background-color 0.15s ease;
+    }
+    .breakdown-item:hover, .breakdown-item:active {
+      background-color: var(--surface-alt);
+    }
+
+    /* Selector rápido de fecha (Mejora 4) */
+    .date-selector-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .date-preset-btn {
+      padding: 6px 10px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      border-radius: 5px;
+      border: 1px solid var(--border);
+      background-color: var(--silky-white);
+      color: var(--navy);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .date-preset-btn.active {
+      background-color: var(--navy);
+      border-color: var(--navy);
+      color: var(--lime);
+    }
+
+    .date-custom-input {
+      flex: 1;
+      padding: 5px 8px;
+      font-size: 0.76rem;
+    }
+
+    .cat-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .cat-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background-color: var(--silky-white);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 6px 9px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--navy);
+      cursor: pointer;
+    }
+
+    .cat-chip.active {
+      background-color: var(--navy);
+      border-color: var(--navy);
+      color: var(--lime);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    .dot-Alimentacion { background-color: var(--dot-alimentacion); }
+    .dot-Transporte { background-color: var(--dot-transporte); }
+    .dot-Entretenimiento { background-color: var(--dot-entretenimiento); }
+    .dot-Salud { background-color: var(--dot-salud); }
+    .dot-Servicios { background-color: var(--dot-servicios); }
+    .dot-Educacion { background-color: var(--dot-educacion); }
+    .dot-Otros { background-color: var(--dot-otros); }
+
+    .form-actions-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .rn-btn-primary {
+      flex: 1;
+      background-color: var(--lime);
+      border: 1px solid #CDE458;
+      border-radius: 6px;
+      padding: 11px;
+      font-family: var(--font-heading);
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+    }
+
+    .rn-btn-cancel-edit {
+      display: none;
+      background-color: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 11px 14px;
+      font-family: var(--font-heading);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--navy);
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .rn-btn-cancel-edit.show {
+      display: inline-block;
+    }
+
+    .period-bar {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 8px;
+    }
+
+    .period-pill {
+      flex: 1;
+      text-align: center;
+      padding: 6px 4px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      border-radius: 5px;
+      border: 1px solid var(--border);
+      background-color: var(--silky-white);
+      color: var(--navy);
+      cursor: pointer;
+    }
+
+    .period-pill.active {
+      background-color: var(--navy);
+      border-color: var(--navy);
+      color: var(--lime);
+    }
+
+    /* Buscador con botón limpiar (Mejora 5) + Selector de Orden (Mejora 3) */
+    .search-sort-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .search-box-wrap {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-box-wrap .rn-input {
+      padding-right: 28px;
+      padding-top: 7px;
+      padding-bottom: 7px;
+      font-size: 0.82rem;
+    }
+
+    .btn-clear-search {
+      position: absolute;
+      right: 6px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1rem;
+      line-height: 1;
+      padding: 2px 5px;
+      cursor: pointer;
+      display: none;
+    }
+
+    .btn-clear-search.show {
+      display: block;
+    }
+
+    .sort-toggle-btn {
+      background-color: var(--silky-white);
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 0 10px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--navy);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .filter-scroll {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      margin-bottom: 6px;
+    }
+
+    .filter-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+      padding: 5px 10px;
+      border-radius: 5px;
+      border: 1px solid var(--border);
+      background-color: var(--silky-white);
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--navy);
+      cursor: pointer;
+    }
+
+    .filter-pill.active {
+      background-color: var(--navy);
+      border-color: var(--navy);
+      color: var(--lime);
+    }
+
+    .expense-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .expense-row:last-child {
+      border-bottom: none;
+      padding-bottom: 2px;
+    }
+
+    .exp-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .exp-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .exp-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .exp-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background-color: var(--surface-alt);
+      border: 1px solid var(--border);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--navy);
+    }
+
+    .exp-date {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .exp-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+
+    .exp-amount {
+      font-family: var(--font-heading);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--navy);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .exp-btn-group {
+      display: flex;
+      gap: 5px;
+    }
+
+    .btn-edit {
+      background-color: var(--surface-alt);
+      color: var(--navy);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 3px 7px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-del {
+      background-color: var(--danger-bg);
+      color: var(--danger);
+      border: none;
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .breakdown-item {
+      margin-bottom: 10px;
+    }
+
+    .breakdown-top {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .breakdown-bar {
+      height: 6px;
+      background-color: var(--surface-alt);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .breakdown-fill {
+      height: 100%;
+      background-color: var(--navy);
+      border-radius: 99px;
+    }
+
+    /* Pie de firma minimalista al final del scroll (Opción 1A) */
+    .author-footer {
+      margin-top: 6px;
+      padding: 12px 8px 6px;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      letter-spacing: 0.02em;
+    }
+
+    .author-footer strong {
+      color: var(--navy);
+      font-weight: 700;
+    }
+
+    /* Snackbar / Toast para Deshacer eliminación (Mejora 2) y confirmación al guardar (Mejora 5) */
+    .app-snackbar {
+      position: absolute;
+      bottom: 64px;
+      left: 14px;
+      right: 14px;
+      background-color: var(--navy);
+      color: var(--silky-white);
+      border-left: 4px solid var(--lime);
+      border-radius: 8px;
+      padding: 10px 14px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.78rem;
+      z-index: 40;
+    }
+
+    .app-snackbar.show {
+      display: flex;
+    }
+
+    .btn-undo {
+      background-color: var(--lime);
+      color: var(--navy);
+      border: none;
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-family: var(--font-heading);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .bottom-nav {
+      background-color: var(--navy);
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 6px 14px;
+      flex-shrink: 0;
+    }
+
+    .nav-tab {
+      background: none;
+      border: none;
+      color: #94A3B8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      font-family: var(--font-body);
+      font-size: 0.68rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 4px 12px;
+      border-radius: 6px;
+    }
+
+    .nav-tab.active {
+      color: var(--lime);
+    }
+
+    .nav-indicator {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: transparent;
+    }
+
+    .nav-tab.active .nav-indicator {
+      background-color: var(--lime);
+    }
+
+    .phone-modal {
+      position: absolute;
+      inset: 0;
+      background-color: rgba(24, 35, 63, 0.75);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 50;
+    }
+
+    .phone-modal.active {
+      display: flex;
+    }
+
+    .phone-modal-box {
+      background-color: var(--surface);
+      border-radius: 12px;
+      padding: 18px;
+      width: 100%;
+      border: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="phone-frame" id="phone-simulator">
+    
+    <div class="status-bar">
+      <span>09:41</span>
+      <div class="status-icons">
+        <span>5G</span>
+        <span>100%</span>
+      </div>
+    </div>
+
+    <header class="app-header">
+      <h1 class="header-title">NOKKO</h1>
+      <button type="button" class="btn-reset-demo" id="btn-restore-tp">Datos de prueba</button>
+    </header>
+
+    <!-- Pestañas superiores fijas y accesibles -->
+    <div class="top-nav-tabs" role="tablist">
+      <button type="button" class="top-tab active" id="tab-btn-home" role="tab" aria-selected="true">Movimientos</button>
+      <button type="button" class="top-tab" id="tab-btn-stats" role="tab" aria-selected="false">Por categoría</button>
+    </div>
+
+    <div class="app-scroll" id="app-scroll-container">
+
+      <section class="total-card">
+        <div class="total-top-row">
+          <span class="total-label">Total</span>
+          <button type="button" class="btn-edit-limit" id="btn-open-limit">Tope: $<span id="limit-label">50.000</span></button>
+        </div>
+        <div class="total-value" id="total-display">$38.500</div>
+        <div class="total-sub" id="count-display">3 movimientos</div>
+
+        <div class="budget-box">
+          <div class="budget-row">
+            <span id="budget-pct-label">77% del tope</span>
+            <span id="budget-rem-label">Disponible: $11.500</span>
+          </div>
+          <div class="budget-track">
+            <div class="budget-fill" id="budget-bar" style="width: 77%;"></div>
+          </div>
+        </div>
+      </section>
+
+      <div class="max-badge" id="max-badge-box">
+        <span>Mayor gasto: <strong id="max-name">Nafta</strong></span>
+        <strong id="max-val" style="font-family: var(--font-heading); font-size: 0.9rem;">$20.000</strong>
+      </div>
+
+      <div class="tab-screen active" id="screen-home">
+
+        <!-- Formulario Nuevo / Editar Gasto (Mejoras 1 y 4) -->
+        <section class="app-card" id="form-card-box">
+          <div class="card-header-row">
+            <h2 class="card-title" id="form-card-title">Nuevo gasto</h2>
+            <span class="editing-badge" id="editing-badge">Editando</span>
+          </div>
+
+          <form id="mobile-expense-form" novalidate>
+            <div class="field-group">
+              <label class="field-label" for="m-desc">Concepto</label>
+              <input type="text" id="m-desc" class="rn-input" placeholder="Supermercado, Nafta, Café...">
+              <div class="field-error" id="err-desc">Escribe un concepto válido.</div>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label" for="m-amount">Monto ($)</label>
+              <input type="text" inputmode="decimal" id="m-amount" class="rn-input" placeholder="15000">
+              <div class="field-error" id="err-amount">Escribe un monto numérico mayor a 0.</div>
+            </div>
+
+            <!-- Selector rápido de fecha (Mejora 4) -->
+            <div class="field-group">
+              <label class="field-label" for="m-date">Fecha</label>
+              <div class="date-selector-row">
+                <button type="button" class="date-preset-btn active" id="btn-date-today">Hoy</button>
+                <button type="button" class="date-preset-btn" id="btn-date-yesterday">Ayer</button>
+                <input type="date" id="m-date" class="rn-input date-custom-input">
+              </div>
+            </div>
+
+            <div class="field-group">
+              <span class="field-label">Categoría</span>
+              <div class="cat-grid" id="form-cat-selector">
+                <button type="button" class="cat-chip active" data-cat="Alimentación"><span class="dot dot-Alimentacion"></span>Alimentación</button>
+                <button type="button" class="cat-chip" data-cat="Transporte"><span class="dot dot-Transporte"></span>Transporte</button>
+                <button type="button" class="cat-chip" data-cat="Entretenimiento"><span class="dot dot-Entretenimiento"></span>Entretenimiento</button>
+                <button type="button" class="cat-chip" data-cat="Salud"><span class="dot dot-Salud"></span>Salud</button>
+                <button type="button" class="cat-chip" data-cat="Servicios"><span class="dot dot-Servicios"></span>Servicios</button>
+                <button type="button" class="cat-chip" data-cat="Educación"><span class="dot dot-Educacion"></span>Educación</button>
+                <button type="button" class="cat-chip" data-cat="Otros"><span class="dot dot-Otros"></span>Otros</button>
+              </div>
+            </div>
+
+            <div class="form-actions-row">
+              <button type="button" class="rn-btn-cancel-edit" id="btn-cancel-edit">Cancelar</button>
+              <button type="submit" class="rn-btn-primary" id="btn-submit-form">Guardar</button>
+            </div>
+          </form>
+        </section>
+
+        <!-- Movimientos con Orden y Búsqueda limpia (Mejoras 3 y 5) -->
+        <section class="app-card">
+          <h2 class="card-title" style="margin-bottom: 10px;">Movimientos</h2>
+
+          <div class="period-bar" id="period-selector">
+            <button type="button" class="period-pill active" data-period="all">Todo</button>
+            <button type="button" class="period-pill" data-period="month">Este mes</button>
+            <button type="button" class="period-pill" data-period="week">7 días</button>
+          </div>
+
+          <div class="search-sort-row">
+            <div class="search-box-wrap">
+              <input type="text" id="m-search" class="rn-input" placeholder="Buscar...">
+              <button type="button" class="btn-clear-search" id="btn-clear-q" aria-label="Limpiar búsqueda">&times;</button>
+            </div>
+            <button type="button" class="sort-toggle-btn" id="btn-sort-toggle">Orden: Recientes</button>
+          </div>
+
+          <div class="filter-scroll" id="list-cat-filter">
+            <button type="button" class="filter-pill active" data-filter="Todas">Todas</button>
+            <button type="button" class="filter-pill" data-filter="Alimentación"><span class="dot dot-Alimentacion"></span>Alimentación</button>
+            <button type="button" class="filter-pill" data-filter="Transporte"><span class="dot dot-Transporte"></span>Transporte</button>
+            <button type="button" class="filter-pill" data-filter="Entretenimiento"><span class="dot dot-Entretenimiento"></span>Entretenimiento</button>
+            <button type="button" class="filter-pill" data-filter="Salud"><span class="dot dot-Salud"></span>Salud</button>
+            <button type="button" class="filter-pill" data-filter="Servicios"><span class="dot dot-Servicios"></span>Servicios</button>
+            <button type="button" class="filter-pill" data-filter="Educación"><span class="dot dot-Educacion"></span>Educación</button>
+            <button type="button" class="filter-pill" data-filter="Otros"><span class="dot dot-Otros"></span>Otros</button>
+          </div>
+
+          <div id="mobile-expenses-list"></div>
+        </section>
+
+      </div>
+
+      <div class="tab-screen" id="screen-stats">
+        <section class="app-card">
+          <h2 class="card-title" style="margin-bottom: 6px;">Gastos por categoría</h2>
+          <p style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 12px;">
+            Toca cualquier categoría para ver sus movimientos en detalle.
+          </p>
+          <div id="mobile-breakdown-list"></div>
+        </section>
+      </div>
+
+      <!-- Pie de firma minimalista (Opción 1A) -->
+      <footer class="author-footer">
+        <strong>NOKKO</strong> v1.0 &middot; by <strong>Marianela Ruiz</strong> &middot; &copy; 2026
+      </footer>
+
+    </div>
+
+    <!-- Barra flotante de confirmación y Deshacer borrado (Mejoras 2 y 5) -->
+    <div class="app-snackbar" id="app-snackbar" role="status" aria-live="polite">
+      <span id="snackbar-text">Movimiento guardado</span>
+      <button type="button" class="btn-undo" id="btn-undo-del" style="display: none;">Deshacer</button>
+    </div>
+
+
+
+    <div class="phone-modal" id="modal-limit">
+      <div class="phone-modal-box">
+        <h3 class="card-title" style="margin-bottom: 10px;">Tope mensual</h3>
+        <div class="field-group">
+          <label class="field-label" for="input-new-limit">Monto ($)</label>
+          <input type="text" inputmode="decimal" id="input-new-limit" class="rn-input" value="50000">
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 12px;">
+          <button type="button" class="period-pill" id="btn-cancel-limit" style="padding: 9px;">Cancelar</button>
+          <button type="button" class="rn-btn-primary" id="btn-save-limit" style="margin-top: 0; padding: 9px; flex: 1;">Guardar</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    (function() {
+      'use strict';
+
+      var STORAGE_EXPENSES_KEY = 'nokko_expenses_v3';
+      var STORAGE_LIMIT_KEY = 'nokko_limit_v2';
+
+      function getLocalIsoDate(daysOffset) {
+        var d = new Date();
+        if (daysOffset) {
+          d.setDate(d.getDate() + daysOffset);
+        }
+        var yyyy = d.getFullYear();
+        var mm = String(d.getMonth() + 1).padStart(2, '0');
+        var dd = String(d.getDate()).padStart(2, '0');
+        return yyyy + '-' + mm + '-' + dd;
+      }
+
+      var SAMPLE_TP_DATA = [
+        { id: '1', desc: 'Supermercado', amount: 15000, category: 'Alimentación', date: getLocalIsoDate(-2) },
+        { id: '2', desc: 'Nafta', amount: 20000, category: 'Transporte', date: getLocalIsoDate(-1) },
+        { id: '3', desc: 'Café', amount: 3500, category: 'Alimentación', date: getLocalIsoDate(0) }
+      ];
+      var INITIAL_DATA = [];
+
+      var state = {
+        expenses: [],
+        selectedCat: 'Alimentación',
+        selectedDate: getLocalIsoDate(0),
+        editingId: null,
+        lastDeleted: null,
+        sortBy: 'recent', // 'recent' o 'amount'
+        filterCat: 'Todas',
+        period: 'all',
+        search: '',
+        budgetLimit: 50000
+      };
+
+      function loadState() {
+        try {
+          var savedExp = localStorage.getItem(STORAGE_EXPENSES_KEY);
+          if (savedExp) {
+            var parsed = JSON.parse(savedExp);
+            if (Array.isArray(parsed)) state.expenses = parsed;
+          } else {
+            state.expenses = INITIAL_DATA.slice();
+          }
+          var savedLim = localStorage.getItem(STORAGE_LIMIT_KEY);
+          if (savedLim) {
+            var numLim = parseFloat(savedLim);
+            if (!isNaN(numLim) && numLim > 0) state.budgetLimit = numLim;
+          }
+        } catch (e) {
+          state.expenses = INITIAL_DATA.slice();
+        }
+      }
+
+      function saveState() {
+        try {
+          localStorage.setItem(STORAGE_EXPENSES_KEY, JSON.stringify(state.expenses));
+          localStorage.setItem(STORAGE_LIMIT_KEY, String(state.budgetLimit));
+        } catch (e) {}
+      }
+
+      var appScrollContainer = document.getElementById('app-scroll-container');
+      var totalDisplay = document.getElementById('total-display');
+      var countDisplay = document.getElementById('count-display');
+      var limitLabel = document.getElementById('limit-label');
+      var budgetPctLabel = document.getElementById('budget-pct-label');
+      var budgetRemLabel = document.getElementById('budget-rem-label');
+      var budgetBar = document.getElementById('budget-bar');
+      var maxBadgeBox = document.getElementById('max-badge-box');
+      var maxName = document.getElementById('max-name');
+      var maxVal = document.getElementById('max-val');
+
+      var formCardBox = document.getElementById('form-card-box');
+      var formCardTitle = document.getElementById('form-card-title');
+      var editingBadge = document.getElementById('editing-badge');
+      var form = document.getElementById('mobile-expense-form');
+      var inputDesc = document.getElementById('m-desc');
+      var inputAmount = document.getElementById('m-amount');
+      var inputDate = document.getElementById('m-date');
+      var btnDateToday = document.getElementById('btn-date-today');
+      var btnDateYesterday = document.getElementById('btn-date-yesterday');
+      var errDesc = document.getElementById('err-desc');
+      var errAmount = document.getElementById('err-amount');
+      var formCatSelector = document.getElementById('form-cat-selector');
+      var btnCancelEdit = document.getElementById('btn-cancel-edit');
+      var btnSubmitForm = document.getElementById('btn-submit-form');
+
+      var periodSelector = document.getElementById('period-selector');
+      var inputSearch = document.getElementById('m-search');
+      var btnClearQ = document.getElementById('btn-clear-q');
+      var btnSortToggle = document.getElementById('btn-sort-toggle');
+      var listCatFilter = document.getElementById('list-cat-filter');
+      var expensesListEl = document.getElementById('mobile-expenses-list');
+      var breakdownListEl = document.getElementById('mobile-breakdown-list');
+
+      var appSnackbar = document.getElementById('app-snackbar');
+      var snackbarText = document.getElementById('snackbar-text');
+      var btnUndoDel = document.getElementById('btn-undo-del');
+
+      var tabBtnHome = document.getElementById('tab-btn-home');
+      var tabBtnStats = document.getElementById('tab-btn-stats');
+      var screenHome = document.getElementById('screen-home');
+      var screenStats = document.getElementById('screen-stats');
+
+      var btnRestoreTp = document.getElementById('btn-restore-tp');
+      var btnOpenLimit = document.getElementById('btn-open-limit');
+      var modalLimit = document.getElementById('modal-limit');
+      var inputNewLimit = document.getElementById('input-new-limit');
+      var btnCancelLimit = document.getElementById('btn-cancel-limit');
+      var btnSaveLimit = document.getElementById('btn-save-limit');
+
+      inputDate.value = state.selectedDate;
+
+      var snackTimer = null;
+      function showSnackbar(text, allowUndo) {
+        snackbarText.textContent = text;
+        btnUndoDel.style.display = allowUndo ? 'inline-block' : 'none';
+        appSnackbar.classList.add('show');
+        if (snackTimer) clearTimeout(snackTimer);
+        snackTimer = setTimeout(function() {
+          appSnackbar.classList.remove('show');
+        }, 4000);
+      }
+
+      function syncDatePresetButtons(dateVal) {
+        var today = getLocalIsoDate(0);
+        var yesterday = getLocalIsoDate(-1);
+        btnDateToday.classList.toggle('active', dateVal === today);
+        btnDateYesterday.classList.toggle('active', dateVal === yesterday);
+      }
+
+      function formatMoney(n) {
+        return '$' + (Number(n) || 0).toLocaleString('es-AR', {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 2
+        });
+      }
+
+      function parseCleanNumber(rawStr) {
+        if (!rawStr) return NaN;
+        var clean = String(rawStr).trim().replace(/\$/g, '').replace(/\s+/g, '');
+        if (clean.indexOf('.') !== -1 && clean.indexOf(',') !== -1) {
+          clean = clean.replace(/\./g, '').replace(',', '.');
+        } else if (clean.indexOf(',') !== -1) {
+          clean = clean.replace(',', '.');
+        }
+        return parseFloat(clean);
+      }
+
+      function normalizeDotClass(catName) {
+        return 'dot-' + String(catName || 'Otros')
+          .normalize('NFD')
+          .replace(/[̀-ͯ]/g, '');
+      }
+
+      function escapeHtml(s) {
+        return String(s || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;');
+      }
+
+      function isWithinPeriod(dateStr, period) {
+        if (period === 'all' || !dateStr) return true;
+        var parts = String(dateStr).split('-');
+        if (parts.length !== 3) return true;
+        var itemDate = new Date(
+          parseInt(parts[0], 10),
+          parseInt(parts[1], 10) - 1,
+          parseInt(parts[2], 10)
+        );
+        var now = new Date();
+        var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+        if (period === 'month') {
+          return itemDate.getFullYear() === today.getFullYear() && itemDate.getMonth() === today.getMonth();
+        }
+        if (period === 'week') {
+          var diffMs = today.getTime() - itemDate.getTime();
+          var diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+          return diffDays >= 0 && diffDays <= 7;
+        }
+        return true;
+      }
+
+      function exitEditMode() {
+        state.editingId = null;
+        formCardBox.classList.remove('editing-mode');
+        formCardTitle.textContent = 'Nuevo gasto';
+        editingBadge.classList.remove('show');
+        btnCancelEdit.classList.remove('show');
+        btnSubmitForm.textContent = 'Guardar';
+        inputDesc.value = '';
+        inputAmount.value = '';
+        state.selectedDate = getLocalIsoDate(0);
+        inputDate.value = state.selectedDate;
+        syncDatePresetButtons(state.selectedDate);
+        errDesc.style.display = 'none';
+        errAmount.style.display = 'none';
+      }
+
+      function renderApp() {
+        var q = state.search.toLowerCase().trim();
+        btnClearQ.classList.toggle('show', q.length > 0);
+
+        var filtered = state.expenses.filter(function(item) {
+          var matchPeriod = isWithinPeriod(item.date, state.period);
+          var matchCat = state.filterCat === 'Todas' || item.category === state.filterCat;
+          var matchSearch = !q || item.desc.toLowerCase().indexOf(q) !== -1;
+          return matchPeriod && matchCat && matchSearch;
+        });
+
+        // Ordenar según selección (Mejora 3)
+        var sorted = filtered.slice().sort(function(a, b) {
+          if (state.sortBy === 'amount') {
+            return b.amount - a.amount;
+          }
+          // Por fecha descendente
+          if ((b.date || '') !== (a.date || '')) {
+            return (b.date || '').localeCompare(a.date || '');
+          }
+          return 0;
+        });
+
+        var total = sorted.reduce(function(acc, cur) { return acc + cur.amount; }, 0);
+        var maxItem = sorted.length > 0
+          ? sorted.reduce(function(m, c) { return c.amount > m.amount ? c : m; }, sorted[0])
+          : null;
+
+        totalDisplay.textContent = formatMoney(total);
+        countDisplay.textContent = sorted.length + (sorted.length === 1 ? ' movimiento' : ' movimientos');
+        limitLabel.textContent = state.budgetLimit.toLocaleString('es-AR');
+
+        var pct = state.budgetLimit > 0 ? Math.round((total / state.budgetLimit) * 100) : 0;
+        var rem = state.budgetLimit - total;
+        budgetPctLabel.textContent = pct + '% del tope';
+        budgetRemLabel.textContent = rem >= 0 ? 'Disponible: ' + formatMoney(rem) : 'Excedido: ' + formatMoney(Math.abs(rem));
+
+        budgetBar.style.width = Math.min(pct, 100) + '%';
+        budgetBar.className = 'budget-fill' + (pct >= 100 ? ' exceeded' : (pct >= 80 ? ' warning' : ''));
+
+        if (maxItem && total > 0) {
+          maxBadgeBox.style.display = 'flex';
+          maxName.textContent = maxItem.desc;
+          maxVal.textContent = formatMoney(maxItem.amount);
+        } else {
+          maxBadgeBox.style.display = 'none';
+        }
+
+        if (sorted.length === 0) {
+          expensesListEl.innerHTML = '<div style="text-align:center; padding:18px 0; color:var(--text-muted); font-size:0.8rem;">Sin movimientos.</div>';
+        } else {
+          var html = '';
+          for (var i = 0; i < sorted.length; i++) {
+            var it = sorted[i];
+            var dotCls = normalizeDotClass(it.category);
+            html += '<div class="expense-row">' +
+              '<div class="exp-info">' +
+                '<div class="exp-title">' + escapeHtml(it.desc) + '</div>' +
+                '<div class="exp-meta-row">' +
+                  '<span class="exp-tag"><span class="dot ' + dotCls + '"></span>' + escapeHtml(it.category) + '</span>' +
+                  '<span class="exp-date">' + escapeHtml(it.date || '') + '</span>' +
+                '</div>' +
+              '</div>' +
+              '<div class="exp-right">' +
+                '<span class="exp-amount">' + formatMoney(it.amount) + '</span>' +
+                '<div class="exp-btn-group">' +
+                  '<button type="button" class="btn-edit" data-edit="' + it.id + '">Editar</button>' +
+                  '<button type="button" class="btn-del" data-del="' + it.id + '">Eliminar</button>' +
+                '</div>' +
+              '</div>' +
+            '</div>';
+          }
+          expensesListEl.innerHTML = html;
+        }
+
+        var cats = ['Alimentación', 'Transporte', 'Entretenimiento', 'Salud', 'Servicios', 'Educación', 'Otros'];
+        var bHtml = '';
+        for (var c = 0; c < cats.length; c++) {
+          var cName = cats[c];
+          var cSum = sorted
+            .filter(function(x) { return x.category === cName; })
+            .reduce(function(a, b) { return a + b.amount; }, 0);
+          if (cSum > 0) {
+            var cPct = total > 0 ? Math.round((cSum / total) * 100) : 0;
+            var cDotCls = normalizeDotClass(cName);
+            bHtml += '<div class="breakdown-item" data-filter-cat="' + cName + '" role="button" aria-label="Ver gastos de ' + cName + '">' +
+              '<div class="breakdown-top">' +
+                '<span style="display:inline-flex; align-items:center; gap:6px;"><span class="dot ' + cDotCls + '"></span>' + cName + ' (' + cPct + '%)</span>' +
+                '<span>' + formatMoney(cSum) + ' &rsaquo;</span>' +
+              '</div>' +
+              '<div class="breakdown-bar"><div class="breakdown-fill" style="width:' + cPct + '%;"></div></div>' +
+            '</div>';
+          }
+        }
+        breakdownListEl.innerHTML = bHtml || '<div style="font-size:0.8rem; color:var(--text-muted);">Sin datos.</div>';
+      }
+
+      
+      // Al hacer clic en un rubro del desglose de Categorías, filtrar y volver a Movimientos
+      breakdownListEl.addEventListener('click', function(e) {
+        var item = e.target.closest('[data-filter-cat]');
+        if (!item) return;
+        var cat = item.getAttribute('data-filter-cat');
+        state.filterCat = cat;
+        listCatFilter.querySelectorAll('.filter-pill').forEach(function(el) {
+          el.classList.toggle('active', el.getAttribute('data-filter') === cat);
+        });
+        tabBtnHome.classList.add('active');
+        tabBtnStats.classList.remove('active');
+        screenHome.classList.add('active');
+        screenStats.classList.remove('active');
+        renderApp();
+        showSnackbar('Filtrando por ' + cat, false);
+      });
+
+      // Al tocar la etiqueta de categoría de un gasto en la lista, filtrar por esa categoría
+      expensesListEl.addEventListener('click', function(e) {
+        var tag = e.target.closest('.exp-tag');
+        if (tag) {
+          var catText = tag.textContent.trim();
+          if (catText) {
+            state.filterCat = catText;
+            listCatFilter.querySelectorAll('.filter-pill').forEach(function(el) {
+              el.classList.toggle('active', el.getAttribute('data-filter') === catText);
+            });
+            renderApp();
+            showSnackbar('Filtrando por ' + catText, false);
+          }
+        }
+      });
+
+      // Selector de fecha rápido (Hoy / Ayer / Calendario)
+      btnDateToday.addEventListener('click', function() {
+        state.selectedDate = getLocalIsoDate(0);
+        inputDate.value = state.selectedDate;
+        syncDatePresetButtons(state.selectedDate);
+      });
+
+      btnDateYesterday.addEventListener('click', function() {
+        state.selectedDate = getLocalIsoDate(-1);
+        inputDate.value = state.selectedDate;
+        syncDatePresetButtons(state.selectedDate);
+      });
+
+      inputDate.addEventListener('change', function() {
+        state.selectedDate = inputDate.value || getLocalIsoDate(0);
+        syncDatePresetButtons(state.selectedDate);
+      });
+
+      formCatSelector.addEventListener('click', function(e) {
+        var chip = e.target.closest('.cat-chip');
+        if (!chip) return;
+        formCatSelector.querySelectorAll('.cat-chip').forEach(function(el) { el.classList.remove('active'); });
+        chip.classList.add('active');
+        state.selectedCat = chip.getAttribute('data-cat');
+      });
+
+      btnCancelEdit.addEventListener('click', function() {
+        exitEditMode();
+      });
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var d = (inputDesc.value || '').trim();
+        var a = parseCleanNumber(inputAmount.value);
+        var ok = true;
+
+        if (!d) { errDesc.style.display = 'block'; ok = false; } else { errDesc.style.display = 'none'; }
+        if (isNaN(a) || a <= 0) { errAmount.style.display = 'block'; ok = false; } else { errAmount.style.display = 'none'; }
+        if (!ok) return;
+
+        var chosenDate = inputDate.value || getLocalIsoDate(0);
+
+        if (state.editingId) {
+          state.expenses = state.expenses.map(function(item) {
+            if (item.id === state.editingId) {
+              return {
+                id: item.id,
+                desc: d,
+                amount: a,
+                category: state.selectedCat,
+                date: chosenDate
+              };
+            }
+            return item;
+          });
+          saveState();
+          exitEditMode();
+          renderApp();
+          showSnackbar('Cambios guardados', false);
+        } else {
+          state.expenses.unshift({
+            id: String(Date.now()),
+            desc: d,
+            amount: a,
+            category: state.selectedCat,
+            date: chosenDate
+          });
+          saveState();
+          exitEditMode();
+          renderApp();
+          showSnackbar('Gasto guardado (' + formatMoney(a) + ')', false);
+        }
+      });
+
+      // Editar o Eliminar gasto desde la lista
+      expensesListEl.addEventListener('click', function(e) {
+        var editBtn = e.target.closest('[data-edit]');
+        if (editBtn) {
+          var editId = editBtn.getAttribute('data-edit');
+          var found = null;
+          for (var i = 0; i < state.expenses.length; i++) {
+            if (state.expenses[i].id === editId) {
+              found = state.expenses[i];
+              break;
+            }
+          }
+          if (found) {
+            state.editingId = found.id;
+            inputDesc.value = found.desc;
+            inputAmount.value = String(found.amount);
+            state.selectedCat = found.category;
+            state.selectedDate = found.date || getLocalIsoDate(0);
+            inputDate.value = state.selectedDate;
+            syncDatePresetButtons(state.selectedDate);
+
+            formCatSelector.querySelectorAll('.cat-chip').forEach(function(el) {
+              el.classList.toggle('active', el.getAttribute('data-cat') === found.category);
+            });
+
+            formCardBox.classList.add('editing-mode');
+            formCardTitle.textContent = 'Editar gasto';
+            editingBadge.classList.add('show');
+            btnCancelEdit.classList.add('show');
+            btnSubmitForm.textContent = 'Actualizar';
+            errDesc.style.display = 'none';
+            errAmount.style.display = 'none';
+
+            formCardBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            inputDesc.focus();
+          }
+          return;
+        }
+
+        var delBtn = e.target.closest('[data-del]');
+        if (delBtn) {
+          var id = delBtn.getAttribute('data-del');
+          for (var j = 0; j < state.expenses.length; j++) {
+            if (state.expenses[j].id === id) {
+              state.lastDeleted = { item: state.expenses[j], index: j };
+              break;
+            }
+          }
+          if (state.editingId === id) {
+            exitEditMode();
+          }
+          state.expenses = state.expenses.filter(function(x) { return x.id !== id; });
+          saveState();
+          renderApp();
+          showSnackbar('Movimiento eliminado', true);
+        }
+      });
+
+      // Botón Deshacer eliminación (Mejora 2)
+      btnUndoDel.addEventListener('click', function() {
+        if (!state.lastDeleted) return;
+        var restored = state.lastDeleted.item;
+        var idx = state.lastDeleted.index;
+        state.expenses.splice(idx, 0, restored);
+        state.lastDeleted = null;
+        saveState();
+        renderApp();
+        appSnackbar.classList.remove('show');
+      });
+
+      // Cambiar orden (Recientes vs Mayor monto - Mejora 3)
+      btnSortToggle.addEventListener('click', function() {
+        if (state.sortBy === 'recent') {
+          state.sortBy = 'amount';
+          btnSortToggle.textContent = 'Orden: Mayor monto';
+        } else {
+          state.sortBy = 'recent';
+          btnSortToggle.textContent = 'Orden: Recientes';
+        }
+        renderApp();
+      });
+
+      listCatFilter.addEventListener('click', function(e) {
+        var pill = e.target.closest('.filter-pill');
+        if (!pill) return;
+        listCatFilter.querySelectorAll('.filter-pill').forEach(function(el) { el.classList.remove('active'); });
+        pill.classList.add('active');
+        state.filterCat = pill.getAttribute('data-filter');
+        renderApp();
+      });
+
+      periodSelector.addEventListener('click', function(e) {
+        var pill = e.target.closest('.period-pill');
+        if (!pill) return;
+        periodSelector.querySelectorAll('.period-pill').forEach(function(el) { el.classList.remove('active'); });
+        pill.classList.add('active');
+        state.period = pill.getAttribute('data-period');
+        renderApp();
+      });
+
+      inputSearch.addEventListener('input', function() {
+        state.search = inputSearch.value;
+        renderApp();
+      });
+
+      btnClearQ.addEventListener('click', function() {
+        state.search = '';
+        inputSearch.value = '';
+        renderApp();
+        inputSearch.focus();
+      });
+
+      btnRestoreTp.addEventListener('click', function() {
+        exitEditMode();
+        state.expenses = SAMPLE_TP_DATA.slice();
+        state.filterCat = 'Todas';
+        state.period = 'all';
+        state.search = '';
+        inputSearch.value = '';
+        listCatFilter.querySelectorAll('.filter-pill').forEach(function(el) {
+          el.classList.toggle('active', el.getAttribute('data-filter') === 'Todas');
+        });
+        periodSelector.querySelectorAll('.period-pill').forEach(function(el) {
+          el.classList.toggle('active', el.getAttribute('data-period') === 'all');
+        });
+        saveState();
+        renderApp();
+        showSnackbar('Datos iniciales restaurados', false);
+      });
+
+      tabBtnHome.addEventListener('click', function() {
+        tabBtnHome.classList.add('active');
+        tabBtnStats.classList.remove('active');
+        screenHome.classList.add('active');
+        screenStats.classList.remove('active');
+      });
+
+      tabBtnStats.addEventListener('click', function() {
+        tabBtnStats.classList.add('active');
+        tabBtnHome.classList.remove('active');
+        screenStats.classList.add('active');
+        screenHome.classList.remove('active');
+      });
+
+      btnOpenLimit.addEventListener('click', function() {
+        inputNewLimit.value = String(state.budgetLimit);
+        modalLimit.classList.add('active');
+      });
+
+      btnCancelLimit.addEventListener('click', function() {
+        modalLimit.classList.remove('active');
+      });
+
+      btnSaveLimit.addEventListener('click', function() {
+        var val = parseCleanNumber(inputNewLimit.value);
+        if (!isNaN(val) && val > 0) {
+          state.budgetLimit = val;
+          saveState();
+          modalLimit.classList.remove('active');
+          renderApp();
+          showSnackbar('Tope actualizado a ' + formatMoney(val), false);
+        }
+      });
+
+      loadState();
+      renderApp();
+    })();
+  </script>
+</body>
+</html>
