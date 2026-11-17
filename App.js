@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+﻿import React, { useState, useRef, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   StyleSheet,
@@ -26,7 +26,7 @@ import {
   GraficoCategorias,
   ModalTope,
   SnackbarAviso,
-} from './ModuloResumen';
+} from './src/components/ModuloResumen';
 
 const EXPENSES_STORAGE_KEY = 'nokko_expenses_v3';
 const BUDGET_LIMIT_STORAGE_KEY = 'nokko_limit_v2';
@@ -128,7 +128,7 @@ export default function App() {
                 !Number.isFinite(Number(item.amount))
             )
           ) {
-            throw new Error('Los movimientos guardados no tienen un formato válido.');
+            throw new Error('Los movimientos guardados no tienen un formato vÃ¡lido.');
           }
           setExpenses(
             parsedExpenses.map(({ desc, ...item }) => ({
@@ -237,14 +237,14 @@ export default function App() {
     let valid = true;
 
     if (!trimmedDesc) {
-      setDescError('Escribe un concepto válido.');
+      setDescError('Escribe un concepto vÃ¡lido.');
       valid = false;
     } else {
       setDescError('');
     }
 
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
-      setAmountError('Escribe un monto numérico mayor a 0.');
+      setAmountError('Escribe un monto numÃ©rico mayor a 0.');
       valid = false;
     } else {
       setAmountError('');
@@ -378,7 +378,7 @@ export default function App() {
           <Text style={styles.inputLabel}>Concepto</Text>
           <TextInput
             style={[styles.textInput, descError ? styles.inputErrorBorder : null]}
-            placeholder="Supermercado, Nafta, Café..."
+            placeholder="Supermercado, Nafta, CafÃ©..."
             placeholderTextColor={COLORS.textMuted}
             value={description}
             onChangeText={(val) => {
@@ -425,7 +425,7 @@ export default function App() {
             />
           </View>
 
-          <Text style={styles.inputLabel}>Categoría</Text>
+          <Text style={styles.inputLabel}>CategorÃ­a</Text>
           <View style={styles.categoryContainer}>
             {CATEGORIES.map((cat) => (
               <TouchableOpacity
@@ -471,7 +471,7 @@ export default function App() {
             {[
               { id: 'all', label: 'Todo' },
               { id: 'month', label: 'Este mes' },
-              { id: 'week', label: '7 días' },
+              { id: 'week', label: '7 dÃ­as' },
             ].map((p) => (
               <TouchableOpacity
                 key={p.id}
@@ -496,7 +496,7 @@ export default function App() {
               />
               {searchQuery.length > 0 ? (
                 <TouchableOpacity style={styles.btnClearSearch} onPress={() => setSearchQuery('')}>
-                  <Text style={styles.btnClearSearchText}>×</Text>
+                  <Text style={styles.btnClearSearchText}>Ã—</Text>
                 </TouchableOpacity>
               ) : null}
             </View>
@@ -571,7 +571,7 @@ export default function App() {
 
         <View style={styles.authorFooter}>
           <Text style={styles.authorFooterText}>
-            <Text style={styles.bold}>NOKKO</Text> v1.0 · by <Text style={styles.bold}>Marianela Ruiz</Text> · © 2026
+            <Text style={styles.bold}>NOKKO</Text> v1.0 Â· by <Text style={styles.bold}>Marianela Ruiz</Text> Â· Â© 2026
           </Text>
         </View>
         </View>
@@ -582,7 +582,7 @@ export default function App() {
           {[
             { id: 'inicio', label: 'Inicio' },
             { id: 'movimientos', label: 'Movimientos' },
-            { id: 'categorias', label: 'Categorías' },
+            { id: 'categorias', label: 'CategorÃ­as' },
           ].map((item) => (
             <TouchableOpacity
               key={item.id}
