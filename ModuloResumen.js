@@ -53,14 +53,6 @@ export const getLocalIsoDate = (daysOffset = 0) => {
   return `${yyyy}-${mm}-${dd}`;
 };
 
-export const SAMPLE_TP_EXPENSES = [
-  { id: '1', description: 'Supermercado', amount: 15000, category: 'Alimentación', date: getLocalIsoDate(-2) },
-  { id: '2', description: 'Nafta', amount: 20000, category: 'Transporte', date: getLocalIsoDate(-1) },
-  { id: '3', description: 'Café', amount: 3500, category: 'Alimentación', date: getLocalIsoDate(0) },
-];
-
-export const INITIAL_EXPENSES = [];
-
 export const parseCleanNumber = (rawStr) => {
   if (!rawStr) return NaN;
   let clean = String(rawStr).trim().replace(/\$/g, '').replace(/\s+/g, '');
@@ -68,6 +60,14 @@ export const parseCleanNumber = (rawStr) => {
     clean = clean.replace(/\./g, '').replace(',', '.');
   } else if (clean.includes(',')) {
     clean = clean.replace(',', '.');
+  } else if (clean.includes('.')) {
+    const parts = clean.split('.');
+    if (parts.length > 2) {
+      const decimalPart = parts.pop();
+      clean = parts.join('') + (decimalPart.length <= 2 ? `.${decimalPart}` : decimalPart);
+    } else if (parts[1].length === 3) {
+      clean = parts.join('');
+    }
   }
   return parseFloat(clean);
 };
@@ -75,35 +75,48 @@ export const parseCleanNumber = (rawStr) => {
 export const formatMoney = (val) =>
   '$' + (Number(val) || 0).toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
 
-export function HeaderNokko({ onResetExamples }) {
+export function HeaderNokko() {
   return (
     <View style={styles.header}>
-      <Text style={styles.headerTitle}>NOKKO</Text>
-      <TouchableOpacity style={styles.btnRestoreHeader} onPress={onResetExamples}>
-        <Text style={styles.btnRestoreHeaderText}>Datos de prueba</Text>
-      </TouchableOpacity>
+      <View style={styles.headerContent}>
+        <Text style={styles.headerTitle}>NOKKO</Text>
+      </View>
     </View>
   );
 }
 
 export function ResumenTotal({
   totalAmount,
+  amount,
   movementsCount,
   budgetLimit,
   budgetPercentage,
   maxExpense,
   onOpenLimit,
+  onChangeAmount,
 }) {
   return (
     <>
       <View style={styles.totalCard}>
         <View style={styles.totalTopRow}>
-          <Text style={styles.totalLabel}>TOTAL</Text>
+          <Text style={styles.totalLabel}>TOTAL A AGREGAR</Text>
           <TouchableOpacity onPress={onOpenLimit}>
-            <Text style={styles.editLimitLink}>Tope: {formatMoney(budgetLimit)}</Text>
+            <Text style={styles.editLimitLink}>
+              Establecer monto tope: {formatMoney(budgetLimit)}
+            </Text>
           </TouchableOpacity>
         </View>
-        <Text style={styles.totalValue}>{formatMoney(totalAmount)}</Text>
+        <TextInput
+          style={styles.totalValue}
+          accessibilityLabel="Importe a agregar"
+          placeholder="0"
+          placeholderTextColor="#A8C94E"
+          keyboardType="decimal-pad"
+          underlineColorAndroid="transparent"
+          value={amount}
+          onChangeText={onChangeAmount}
+        />
+        <Text style={styles.totalSub}>Acumulado: {formatMoney(totalAmount)}</Text>
         <Text style={styles.totalSub}>
           {movementsCount} movimiento{movementsCount === 1 ? '' : 's'}
         </Text>
@@ -171,16 +184,71 @@ export function DesgloseCategorias({ totalsByCategory }) {
   );
 }
 
+export function GraficoCategorias({ totalsByCategory }) {
+  const total = totalsByCategory.reduce((sum, entry) => sum + entry.total, 0);
+
+  return (
+    <View style={styles.categoryChart}>
+      <View style={styles.chartHeader}>
+        <View>
+          <Text style={styles.chartTitle}>Distribución por categoría</Text>
+          <Text style={styles.chartSubtitle}>Del gasto mostrado</Text>
+        </View>
+        <Text style={styles.chartTotal}>{formatMoney(total)}</Text>
+      </View>
+
+      {total > 0 ? (
+        <>
+          <View style={styles.chartBarTrack}>
+            {totalsByCategory.map((entry) => (
+              <View
+                key={entry.category}
+                style={[
+                  styles.chartBarSegment,
+                  {
+                    width: `${(entry.total / total) * 100}%`,
+                    backgroundColor: CATEGORY_DOTS[entry.category] || '#64748B',
+                  },
+                ]}
+              />
+            ))}
+          </View>
+          <View style={styles.chartLegend}>
+            {totalsByCategory.map((entry) => (
+              <View key={entry.category} style={styles.chartLegendRow}>
+                <View style={styles.chartLegendCategory}>
+                  <View
+                    style={[
+                      styles.dotIndicator,
+                      { backgroundColor: CATEGORY_DOTS[entry.category] || '#64748B' },
+                    ]}
+                  />
+                  <Text style={styles.chartLegendText} numberOfLines={1}>
+                    {entry.category} ({Math.round((entry.total / total) * 100)}%)
+                  </Text>
+                </View>
+                <Text style={styles.chartLegendAmount}>{formatMoney(entry.total)}</Text>
+              </View>
+            ))}
+          </View>
+        </>
+      ) : (
+        <Text style={styles.chartEmptyText}>Agrega un movimiento para ver la distribución.</Text>
+      )}
+    </View>
+  );
+}
+
 export function ModalTope({ visible, newLimitInput, setNewLimitInput, onCancel, onSave }) {
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onCancel}>
       <View style={styles.modalOverlay}>
         <View style={styles.modalBox}>
-          <Text style={styles.sectionTitle}>TOPE MENSUAL</Text>
+          <Text style={styles.sectionTitle}>ESTABLECER MONTO TOPE</Text>
           <Text style={styles.inputLabel}>Monto ($)</Text>
           <TextInput
             style={styles.textInput}
-            keyboardType="numeric"
+            keyboardType="decimal-pad"
             value={newLimitInput}
             onChangeText={setNewLimitInput}
           />
@@ -218,24 +286,20 @@ export function SnackbarAviso({ snackbar, onUndo }) {
 const styles = StyleSheet.create({
   header: {
     backgroundColor: COLORS.nauticalNavy,
-    paddingVertical: 14,
-    paddingHorizontal: 20,
     borderBottomWidth: 3,
     borderBottomColor: COLORS.soothingLime,
+  },
+  headerContent: {
+    width: '100%',
+    maxWidth: 1180,
+    alignSelf: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
   headerTitle: { color: COLORS.silkyWhite, fontSize: 24, fontWeight: '800', letterSpacing: 1.5 },
-  btnRestoreHeader: {
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    borderWidth: 1,
-    borderColor: 'rgba(146,186,212,0.3)',
-    borderRadius: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
-  btnRestoreHeaderText: { color: COLORS.floralBlue, fontSize: 11, fontWeight: '600' },
   totalCard: {
     backgroundColor: COLORS.nauticalNavy,
     borderRadius: 10,
@@ -245,7 +309,16 @@ const styles = StyleSheet.create({
   totalTopRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   totalLabel: { color: COLORS.floralBlue, fontSize: 11, fontWeight: '700', letterSpacing: 1 },
   editLimitLink: { color: COLORS.soothingLime, fontSize: 12, textDecorationLine: 'underline', fontWeight: '600' },
-  totalValue: { color: COLORS.soothingLime, fontSize: 32, fontWeight: '800', marginVertical: 2 },
+  totalValue: {
+    color: COLORS.soothingLime,
+    fontSize: 32,
+    fontWeight: '800',
+    marginVertical: 2,
+    height: 42,
+    padding: 0,
+    borderWidth: 0,
+    backgroundColor: 'transparent',
+  },
   totalSub: { color: COLORS.silkyWhite, fontSize: 12, opacity: 0.85 },
   budgetBox: { marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.12)' },
   budgetRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
@@ -284,6 +357,33 @@ const styles = StyleSheet.create({
   breakdownCatTotal: { fontSize: 12, fontWeight: '800', color: COLORS.nauticalNavy },
   breakdownBarBg: { height: 6, backgroundColor: COLORS.surfaceAlt, borderRadius: 3, overflow: 'hidden' },
   breakdownBarFill: { height: '100%', backgroundColor: COLORS.nauticalNavy, borderRadius: 3 },
+  categoryChart: {
+    backgroundColor: COLORS.surfaceAlt,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    padding: 12,
+    marginBottom: 14,
+  },
+  chartHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
+  chartTitle: { color: COLORS.nauticalNavy, fontSize: 12, fontWeight: '800' },
+  chartSubtitle: { color: COLORS.textMuted, fontSize: 10, marginTop: 2 },
+  chartTotal: { color: COLORS.nauticalNavy, fontSize: 12, fontWeight: '800' },
+  chartBarTrack: {
+    flexDirection: 'row',
+    height: 10,
+    borderRadius: 6,
+    overflow: 'hidden',
+    backgroundColor: COLORS.surface,
+    marginBottom: 10,
+  },
+  chartBarSegment: { height: '100%' },
+  chartLegend: { gap: 7 },
+  chartLegendRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
+  chartLegendCategory: { flex: 1, flexDirection: 'row', alignItems: 'center', minWidth: 0 },
+  chartLegendText: { color: COLORS.nauticalNavy, fontSize: 11, fontWeight: '600', flexShrink: 1 },
+  chartLegendAmount: { color: COLORS.nauticalNavy, fontSize: 11, fontWeight: '800' },
+  chartEmptyText: { color: COLORS.textMuted, fontSize: 11, paddingVertical: 5 },
   inputLabel: { fontSize: 11, fontWeight: '700', color: COLORS.nauticalNavy, marginTop: 8, marginBottom: 4, textTransform: 'uppercase' },
   textInput: {
     backgroundColor: COLORS.silkyWhite,

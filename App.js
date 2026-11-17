@@ -1,15 +1,16 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   StyleSheet,
   Text,
   View,
   TextInput,
-  Button,
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
   StatusBar,
   Platform,
+  useWindowDimensions,
 } from 'react-native';
 
 import {
@@ -17,19 +18,46 @@ import {
   CATEGORIES,
   CATEGORY_DOTS,
   getLocalIsoDate,
-  SAMPLE_TP_EXPENSES,
-  INITIAL_EXPENSES,
   parseCleanNumber,
   formatMoney,
   HeaderNokko,
   ResumenTotal,
   DesgloseCategorias,
+  GraficoCategorias,
   ModalTope,
   SnackbarAviso,
 } from './ModuloResumen';
 
+const EXPENSES_STORAGE_KEY = 'nokko_expenses_v3';
+const BUDGET_LIMIT_STORAGE_KEY = 'nokko_limit_v2';
+
+const loadPersistedData = async () => {
+  const keys = [EXPENSES_STORAGE_KEY, BUDGET_LIMIT_STORAGE_KEY];
+  if (Platform.OS === 'web') {
+    return keys.map((key) => window.localStorage.getItem(key));
+  }
+  const storedItems = await AsyncStorage.multiGet(keys);
+  return storedItems.map(([, value]) => value);
+};
+
+const savePersistedData = async (expenses, budgetLimit) => {
+  const values = [
+    [EXPENSES_STORAGE_KEY, JSON.stringify(expenses)],
+    [BUDGET_LIMIT_STORAGE_KEY, String(budgetLimit)],
+  ];
+  if (Platform.OS === 'web') {
+    values.forEach(([key, value]) => window.localStorage.setItem(key, value));
+    return;
+  }
+  await AsyncStorage.multiSet(values);
+};
+
 export default function App() {
-  const [expenses, setExpenses] = useState(INITIAL_EXPENSES);
+  const { width } = useWindowDimensions();
+  const isWideScreen = width >= 900;
+  const isCompactScreen = width < 380;
+  const [expenses, setExpenses] = useState([]);
+  const [storageReady, setStorageReady] = useState(false);
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(CATEGORIES[0]);
@@ -59,6 +87,62 @@ export default function App() {
       setSnackbar({ visible: false, text: '', canUndo: false });
     }, 4000);
   };
+
+  useEffect(() => {
+    let isMounted = true;
+    const restoreSavedData = async () => {
+      try {
+        const [storedExpenses, storedBudgetLimit] = await loadPersistedData();
+        if (!isMounted) return;
+
+        if (storedExpenses !== null) {
+          const parsedExpenses = JSON.parse(storedExpenses);
+          if (
+            !Array.isArray(parsedExpenses) ||
+            parsedExpenses.some(
+              (item) =>
+                !item ||
+                typeof item !== 'object' ||
+                typeof (item.description || item.desc) !== 'string' ||
+                !Number.isFinite(Number(item.amount))
+            )
+          ) {
+            throw new Error('Los movimientos guardados no tienen un formato válido.');
+          }
+          setExpenses(
+            parsedExpenses.map(({ desc, ...item }) => ({
+              ...item,
+              description: item.description || desc,
+            }))
+          );
+        }
+
+        const parsedBudgetLimit = parseCleanNumber(storedBudgetLimit);
+        if (Number.isFinite(parsedBudgetLimit) && parsedBudgetLimit > 0) {
+          setBudgetLimit(parsedBudgetLimit);
+        }
+        setStorageReady(true);
+      } catch (error) {
+        console.error('No se pudieron cargar los datos guardados.', error);
+        if (isMounted) {
+          showNotice('No se pudieron cargar los datos guardados.');
+        }
+      }
+    };
+
+    restoreSavedData();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!storageReady) return;
+    savePersistedData(expenses, budgetLimit).catch((error) => {
+      console.error('No se pudieron guardar los datos.', error);
+      showNotice('No se pudieron guardar los datos.');
+    });
+  }, [expenses, budgetLimit, storageReady]);
 
   const isWithinPeriod = (dateStr) => {
     if (periodFilter === 'all' || !dateStr) return true;
@@ -122,6 +206,11 @@ export default function App() {
   };
 
   const handleSaveExpense = () => {
+    if (!storageReady) {
+      showNotice('Cargando los datos guardados. Intenta guardar en un momento.');
+      return;
+    }
+
     const trimmedDesc = description.trim();
     const parsedAmount = parseCleanNumber(amount);
     let valid = true;
@@ -202,16 +291,12 @@ export default function App() {
     setSnackbar({ visible: false, text: '', canUndo: false });
   };
 
-  const handleResetExamples = () => {
-    exitEditMode();
-    setExpenses(SAMPLE_TP_EXPENSES);
-    setActiveCategoryFilter('Todas');
-    setPeriodFilter('all');
-    setSearchQuery('');
-    showNotice('Datos iniciales restaurados', false);
-  };
-
   const handleSaveLimit = () => {
+    if (!storageReady) {
+      showNotice('Cargando los datos guardados. Intenta nuevamente en un momento.');
+      return;
+    }
+
     const parsed = parseCleanNumber(newLimitInput);
     if (!isNaN(parsed) && parsed > 0) {
       setBudgetLimit(parsed);
@@ -227,21 +312,29 @@ export default function App() {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.nauticalNavy} />
 
-      <HeaderNokko onResetExamples={handleResetExamples} />
+      <HeaderNokko />
 
-      <ScrollView ref={scrollRef} contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        ref={scrollRef}
+        contentContainerStyle={isWideScreen ? styles.scrollContentWide : styles.scrollContent}
+      >
+        <View style={styles.content}>
         <ResumenTotal
           totalAmount={totalAmount}
+          amount={amount}
           movementsCount={filteredExpenses.length}
           budgetLimit={budgetLimit}
           budgetPercentage={budgetPercentage}
           maxExpense={maxExpense}
+          onChangeAmount={setAmount}
           onOpenLimit={() => {
             setNewLimitInput(String(budgetLimit));
             setIsLimitModalVisible(true);
           }}
         />
 
+        <View style={isWideScreen ? styles.desktopColumns : null}>
+          <View style={isWideScreen ? styles.desktopLeftColumn : null}>
         <View style={[styles.card, editingId ? styles.cardEditing : null]}>
           <View style={styles.cardHeaderRow}>
             <Text style={styles.sectionTitle}>{editingId ? 'EDITAR GASTO' : 'NUEVO GASTO'}</Text>
@@ -268,9 +361,9 @@ export default function App() {
           <Text style={styles.inputLabel}>Monto ($)</Text>
           <TextInput
             style={[styles.textInput, amountError ? styles.inputErrorBorder : null]}
-            placeholder="15000"
+            placeholder="0"
             placeholderTextColor={COLORS.textMuted}
-            keyboardType="numeric"
+            keyboardType="decimal-pad"
             value={amount}
             onChangeText={(val) => {
               setAmount(val);
@@ -330,8 +423,13 @@ export default function App() {
           </View>
         </View>
 
+            {isWideScreen ? <DesgloseCategorias totalsByCategory={totalsByCategory} /> : null}
+          </View>
+
+          <View style={isWideScreen ? styles.desktopRightColumn : null}>
         <View style={styles.card}>
           <Text style={[styles.sectionTitle, { marginBottom: 10 }]}>MOVIMIENTOS</Text>
+            <GraficoCategorias totalsByCategory={totalsByCategory} />
 
           <View style={styles.periodRow}>
             {[
@@ -351,7 +449,7 @@ export default function App() {
             ))}
           </View>
 
-          <View style={styles.searchSortRow}>
+          <View style={[styles.searchSortRow, isCompactScreen ? styles.searchSortCompact : null]}>
             <View style={styles.searchWrap}>
               <TextInput
                 style={styles.searchInput}
@@ -396,9 +494,6 @@ export default function App() {
           {filteredExpenses.length === 0 ? (
             <View style={styles.emptyContainer}>
               <Text style={styles.emptyText}>Sin movimientos.</Text>
-              <View style={{ marginTop: 10 }}>
-                <Button title="Datos de prueba iniciales" color={COLORS.nauticalNavy} onPress={handleResetExamples} />
-              </View>
             </View>
           ) : (
             filteredExpenses.map((item) => (
@@ -429,13 +524,16 @@ export default function App() {
             ))
           )}
         </View>
+          </View>
+        </View>
 
-        <DesgloseCategorias totalsByCategory={totalsByCategory} />
+        {!isWideScreen ? <DesgloseCategorias totalsByCategory={totalsByCategory} /> : null}
 
         <View style={styles.authorFooter}>
           <Text style={styles.authorFooterText}>
             <Text style={styles.bold}>NOKKO</Text> v1.0 · by <Text style={styles.bold}>Marianela Ruiz</Text> · © 2026
           </Text>
+        </View>
         </View>
       </ScrollView>
 
@@ -459,6 +557,11 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
   scrollContent: { padding: 16, paddingBottom: 70 },
+  scrollContentWide: { paddingHorizontal: 28, paddingTop: 24, paddingBottom: 70, alignItems: 'center' },
+  content: { width: '100%', maxWidth: 1180 },
+  desktopColumns: { flexDirection: 'row', alignItems: 'flex-start', gap: 20 },
+  desktopLeftColumn: { flex: 0.9, minWidth: 0 },
+  desktopRightColumn: { flex: 1.1, minWidth: 0 },
   bold: { fontWeight: '700', color: COLORS.nauticalNavy },
   card: {
     backgroundColor: COLORS.surface,
@@ -562,6 +665,7 @@ const styles = StyleSheet.create({
   periodBtnText: { fontSize: 11, fontWeight: '700', color: COLORS.nauticalNavy },
   periodBtnTextActive: { color: COLORS.soothingLime },
   searchSortRow: { flexDirection: 'row', gap: 6, marginBottom: 10 },
+  searchSortCompact: { flexDirection: 'column' },
   searchWrap: { flex: 1, position: 'relative', justifyContent: 'center' },
   searchInput: {
     backgroundColor: COLORS.silkyWhite,
@@ -582,6 +686,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
     borderRadius: 6,
     paddingHorizontal: 10,
+    paddingVertical: 8,
     justifyContent: 'center',
   },
   sortToggleText: { color: COLORS.nauticalNavy, fontSize: 11, fontWeight: '700' },
