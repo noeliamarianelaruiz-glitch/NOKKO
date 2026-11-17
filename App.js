@@ -77,8 +77,29 @@ export default function App() {
 
   const [snackbar, setSnackbar] = useState({ visible: false, text: '', canUndo: false });
   const [lastDeleted, setLastDeleted] = useState(null);
+  const [activeNavigation, setActiveNavigation] = useState('inicio');
   const snackTimerRef = useRef(null);
   const scrollRef = useRef(null);
+  const sectionOffsetsRef = useRef({ columns: 0, movements: 0, categories: 0 });
+
+  const scrollToSection = (section) => {
+    setActiveNavigation(section);
+    if (scrollRef.current) {
+      const offset = section === 'inicio' ? 0 : sectionOffsetsRef.current[section];
+      scrollRef.current.scrollTo({ y: offset, animated: true });
+    }
+  };
+
+  const updateActiveNavigation = (offset) => {
+    const { movements, categories } = sectionOffsetsRef.current;
+    const section =
+      categories > 0 && offset >= categories - 100
+        ? 'categorias'
+        : movements > 0 && offset >= movements - 100
+        ? 'movimientos'
+        : 'inicio';
+    setActiveNavigation((active) => (active === section ? active : section));
+  };
 
   const showNotice = (text, canUndo = false) => {
     if (snackTimerRef.current) clearTimeout(snackTimerRef.current);
@@ -316,9 +337,12 @@ export default function App() {
 
       <ScrollView
         ref={scrollRef}
-        contentContainerStyle={isWideScreen ? styles.scrollContentWide : styles.scrollContent}
+        contentContainerStyle={isWideScreen ? styles.scrollContentWide : styles.scrollContentMobile}
+        onScroll={(event) => updateActiveNavigation(event.nativeEvent.contentOffset.y)}
+        scrollEventThrottle={100}
       >
         <View style={styles.content}>
+        <View onLayout={(event) => { sectionOffsetsRef.current.summary = event.nativeEvent.layout.y; }}>
         <ResumenTotal
           totalAmount={totalAmount}
           amount={amount}
@@ -332,8 +356,14 @@ export default function App() {
             setIsLimitModalVisible(true);
           }}
         />
+        </View>
 
-        <View style={isWideScreen ? styles.desktopColumns : null}>
+        <View
+          style={isWideScreen ? styles.desktopColumns : null}
+          onLayout={(event) => {
+            sectionOffsetsRef.current.columns = event.nativeEvent.layout.y;
+          }}
+        >
           <View style={isWideScreen ? styles.desktopLeftColumn : null}>
         <View style={[styles.card, editingId ? styles.cardEditing : null]}>
           <View style={styles.cardHeaderRow}>
@@ -426,7 +456,13 @@ export default function App() {
             {isWideScreen ? <DesgloseCategorias totalsByCategory={totalsByCategory} /> : null}
           </View>
 
-          <View style={isWideScreen ? styles.desktopRightColumn : null}>
+          <View
+            style={isWideScreen ? styles.desktopRightColumn : null}
+            onLayout={(event) => {
+              sectionOffsetsRef.current.movements =
+                sectionOffsetsRef.current.columns + event.nativeEvent.layout.y;
+            }}
+          >
         <View style={styles.card}>
           <Text style={[styles.sectionTitle, { marginBottom: 10 }]}>MOVIMIENTOS</Text>
             <GraficoCategorias totalsByCategory={totalsByCategory} />
@@ -527,7 +563,11 @@ export default function App() {
           </View>
         </View>
 
-        {!isWideScreen ? <DesgloseCategorias totalsByCategory={totalsByCategory} /> : null}
+        {!isWideScreen ? (
+          <View onLayout={(event) => { sectionOffsetsRef.current.categories = event.nativeEvent.layout.y; }}>
+            <DesgloseCategorias totalsByCategory={totalsByCategory} />
+          </View>
+        ) : null}
 
         <View style={styles.authorFooter}>
           <Text style={styles.authorFooterText}>
@@ -536,6 +576,36 @@ export default function App() {
         </View>
         </View>
       </ScrollView>
+
+      {!isWideScreen ? (
+        <View style={styles.bottomNavigation}>
+          {[
+            { id: 'inicio', label: 'Inicio' },
+            { id: 'movimientos', label: 'Movimientos' },
+            { id: 'categorias', label: 'Categorías' },
+          ].map((item) => (
+            <TouchableOpacity
+              key={item.id}
+              style={[
+                styles.bottomNavigationItem,
+                activeNavigation === item.id ? styles.bottomNavigationItemActive : null,
+              ]}
+              accessibilityRole="button"
+              accessibilityState={{ selected: activeNavigation === item.id }}
+              onPress={() => scrollToSection(item.id)}
+            >
+              <Text
+                style={[
+                  styles.bottomNavigationText,
+                  activeNavigation === item.id ? styles.bottomNavigationTextActive : null,
+                ]}
+              >
+                {item.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      ) : null}
 
       <SnackbarAviso snackbar={snackbar} onUndo={handleUndoDelete} />
 
@@ -556,12 +626,38 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.silkyWhite,
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
-  scrollContent: { padding: 16, paddingBottom: 70 },
+  scrollContentMobile: { padding: 16, paddingBottom: 112 },
   scrollContentWide: { paddingHorizontal: 28, paddingTop: 24, paddingBottom: 70, alignItems: 'center' },
   content: { width: '100%', maxWidth: 1180 },
   desktopColumns: { flexDirection: 'row', alignItems: 'flex-start', gap: 20 },
   desktopLeftColumn: { flex: 0.9, minWidth: 0 },
   desktopRightColumn: { flex: 1.1, minWidth: 0 },
+  bottomNavigation: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 10,
+    flexDirection: 'row',
+    paddingHorizontal: 8,
+    paddingTop: 8,
+    paddingBottom: Platform.OS === 'ios' ? 20 : 10,
+    backgroundColor: COLORS.surface,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
+    elevation: 10,
+  },
+  bottomNavigationItem: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    borderTopWidth: 2,
+    borderTopColor: 'transparent',
+  },
+  bottomNavigationItemActive: { borderTopColor: COLORS.soothingLime },
+  bottomNavigationText: { color: COLORS.textMuted, fontSize: 11, fontWeight: '600' },
+  bottomNavigationTextActive: { color: COLORS.nauticalNavy, fontWeight: '800' },
   bold: { fontWeight: '700', color: COLORS.nauticalNavy },
   card: {
     backgroundColor: COLORS.surface,

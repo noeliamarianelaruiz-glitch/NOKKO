@@ -118,6 +118,45 @@
       flex-shrink: 0;
     }
 
+    .app-brand-subtitle {
+      display: block;
+      color: var(--floral-blue);
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      margin-top: 3px;
+    }
+
+    .top-nav-tabs {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 20;
+      display: flex;
+      gap: 8px;
+      padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
+      background-color: var(--surface);
+      border-top: 1px solid var(--border);
+    }
+
+    .top-tab {
+      flex: 1;
+      border: 0;
+      border-top: 2px solid transparent;
+      border-radius: 0;
+      padding: 9px 6px;
+      background-color: transparent;
+      color: var(--text-muted);
+      font: 600 0.7rem var(--font-body);
+      cursor: pointer;
+    }
+
+    .top-tab.active {
+      border-top-color: var(--lime);
+      color: var(--navy);
+    }
+
     .header-title {
       font-family: var(--font-heading);
       color: var(--silky-white);
@@ -131,7 +170,7 @@
     .app-scroll {
       flex: 1;
       overflow-y: auto;
-      padding: 14px;
+      padding: 14px 14px 90px;
       display: flex;
       flex-direction: column;
       gap: 12px;
@@ -870,6 +909,7 @@
       }
 
       .top-nav-tabs {
+        position: static;
         display: flex;
         gap: 8px;
         padding: 8px 20px;
@@ -927,7 +967,10 @@
     
 
     <header class="app-header">
-      <h1 class="header-title">NOKKO</h1>
+      <div>
+        <h1 class="header-title">NOKKO</h1>
+        <span class="app-brand-subtitle">CONTROL DE GASTOS</span>
+      </div>
     </header>
 
     <!-- Pestañas superiores fijas y accesibles -->
@@ -1669,13 +1712,16 @@
       tabBtnHome.addEventListener('click', function() {
         tabBtnHome.classList.add('active');
         tabBtnStats.classList.remove('active');
+        tabBtnHome.setAttribute('aria-selected', 'true');
+        tabBtnStats.setAttribute('aria-selected', 'false');
         screenHome.classList.add('active');
         screenStats.classList.remove('active');
       });
-
       tabBtnStats.addEventListener('click', function() {
         tabBtnStats.classList.add('active');
         tabBtnHome.classList.remove('active');
+        tabBtnStats.setAttribute('aria-selected', 'true');
+        tabBtnHome.setAttribute('aria-selected', 'false');
         screenStats.classList.add('active');
         screenHome.classList.remove('active');
       });

@@ -79,7 +79,10 @@ export function HeaderNokko() {
   return (
     <View style={styles.header}>
       <View style={styles.headerContent}>
-        <Text style={styles.headerTitle}>NOKKO</Text>
+        <View>
+          <Text style={styles.headerTitle}>NOKKO</Text>
+          <Text style={styles.headerSubtitle}>CONTROL DE GASTOS</Text>
+        </View>
       </View>
     </View>
   );
@@ -299,7 +302,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  headerTitle: { color: COLORS.silkyWhite, fontSize: 24, fontWeight: '800', letterSpacing: 1.5 },
+  headerTitle: { color: COLORS.silkyWhite, fontSize: 23, fontWeight: '800', letterSpacing: 1.5 },
+  headerSubtitle: { color: COLORS.floralBlue, fontSize: 9, fontWeight: '700', letterSpacing: 1.2, marginTop: 2 },
   totalCard: {
     backgroundColor: COLORS.nauticalNavy,
     borderRadius: 10,
